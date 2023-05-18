@@ -60,13 +60,29 @@ abstract class SinglyLinkedIntList extends IntList {
    * Beleg 1
    */
 
-  override def foldRight(initial: Int)(reduceFunc: (Int, Int) => Int): Int = ???
+  override def foldRight(initial: Int)(reduceFunc: (Int, Int) => Int): Int = this match {
+    case Empty => initial
+    case Cons(_, _) => reduceFunc(head, tail.foldRight(initial)(reduceFunc))
+  }
 
-  override def reduceLeft(reduceFunc: (Int, Int) => Int): Int = ???
+  override def reduceLeft(reduceFunc: (Int, Int) => Int): Int = this match {
+    // head as initial element
+    case Cons(_, _) => (tail.foldLeft(head))(reduceFunc)
+  }
 
-  override def reduceRight(reduceFunc: (Int, Int) => Int): Int = ???
+  override def reduceRight(reduceFunc: (Int, Int) => Int): Int = this match {
+    // 1 shy of end -> return the head
+    case Cons(_, Empty) => head
+    // do reduction with head and reduction of tail
+    case Cons(_, _) => reduceFunc(head, tail.reduceRight(reduceFunc))
+  }
 
-  override def forAll(predicateFunc: Int => Boolean): Boolean = ???
+  override def forAll(predicateFunc: Int => Boolean): Boolean = this match {
+    case Cons(_, Empty) => predicateFunc(head)
+    case Cons(_, _) => val current = predicateFunc(head)
+      // when predicateFunc is called instead of current it increases c once more when returning false
+      if (current) tail.forAll(predicateFunc) else current
+  }
 
   override def insertSorted(elem: Int): IntList = ???
 
