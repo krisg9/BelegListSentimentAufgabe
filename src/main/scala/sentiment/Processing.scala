@@ -1,14 +1,17 @@
 package sentiment
 
+import scala.collection.mutable
+import scala.collection.mutable.HashMap
+
 class Processing {
-   
-  /**********************************************************************************************
+
+  /** ********************************************************************************************
    *
-   *                          Aufgabe 1
-   *   
-   *********************************************************************************************
-  */
-  def getWords(line:String):List[String]={
+   * Aufgabe 1
+   *
+   * ********************************************************************************************
+   */
+  def getWords(line: String): List[String] = {
     /*
      * Extracts all words from a line
      * 
@@ -16,34 +19,49 @@ class Processing {
      * 2. Shifts all words to lower case
      * 3. Extracts all words and put them into a list of strings
      */
-    ???
+    line
+      .replaceAll("[^A-za-z]", " ")
+      .split(" ")
+      .map(_.toLowerCase)
+      .filter(x => x.nonEmpty)
+      .toList
   }
-  
-  def getAllWords(l:List[(Int,String)]):List[String]={
+
+  def getAllWords(l: List[(Int, String)]): List[String] = {
     /*
      * Extracts all words from a List containing line number and line tuples
      * The words should be in the same order as they occur in the source document
      * 
      * Hint: Use the flatMap function
      */
-     ???
+    l.flatMap(tuple => getWords(tuple._2))
   }
-  
-  def countWords(l:List[String]):List[(String,Int)]={
+
+  def countWords(l: List[String]): List[(String, Int)] = {
     /*
      *  Gets a list of words and counts the occurrences of the individual words
      */
-    ???
+    // group by word
+    l.groupBy(identity)
+      // mapValues on Map is deprecated
+      .view
+      .mapValues(_.size)
+      .toList
   }
 
-  /**********************************************************************************************
+  /** ********************************************************************************************
    *
-   *                          Aufgabe 2
+   * Aufgabe 2
    *
-   *********************************************************************************************
-  */
+   * ********************************************************************************************
+   */
 
-  def getAllWordsWithIndex(l: List[(Int, String)]): List[(Int, String)] = ???
+  def getAllWordsWithIndex(l: List[(Int, String)]): List[(Int, String)] = {
+    l.flatMap({
+      case (lineNum, line) => val words = getWords(line)
+        words.map(word => (lineNum, word))
+    })
+  }
 
   def createInverseIndex(l: List[(Int, String)]): Map[String, List[Int]] = ???
 
@@ -53,14 +71,16 @@ class Processing {
 }
 
 
-object Processing{
-  
-  def getData(filename:String):List[(Int,String)]={
-    val url= getClass.getResource("/"+filename).getPath
-    val src = scala.io.Source.fromFile(url.replaceAll("%20"," "))
+object Processing {
+
+  def getData(filename: String): List[(Int, String)] = {
+    val url = getClass.getResource("/" + filename).getPath
+    val src = scala.io.Source.fromFile(url.replaceAll("%20", " "))
     val iter = src.getLines()
     var c = -1
-    val result= (for (row <- iter) yield {c=c+1;(c,row)}).toList
+    val result = (for (row <- iter) yield {
+      c = c + 1; (c, row)
+    }).toList
     src.close()
     result
   }
