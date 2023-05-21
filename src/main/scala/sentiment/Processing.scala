@@ -1,7 +1,5 @@
 package sentiment
 
-import scala.collection.mutable
-import scala.collection.mutable.HashMap
 
 class Processing {
 
@@ -58,16 +56,30 @@ class Processing {
 
   def getAllWordsWithIndex(l: List[(Int, String)]): List[(Int, String)] = {
     l.flatMap({
-      case (lineNum, line) => val words = getWords(line)
-        words.map(word => (lineNum, word))
+      case (lineNum, line) => getWords(line).map(word => (lineNum, word))
     })
   }
 
-  def createInverseIndex(l: List[(Int, String)]): Map[String, List[Int]] = ???
+  def createInverseIndex(l: List[(Int, String)]): Map[String, List[Int]] = {
+    // group by word
+    l.groupBy(tuple => tuple._2)
+      // map view in order to get mapValues
+      .view
+      .mapValues(_.map(_._1))
+      .toMap
+  }
 
-  def orConjunction(words: List[String], invInd: Map[String, List[Int]]): List[Int] = ???
+  def orConjunction(words: List[String], invInd: Map[String, List[Int]]): List[Int] = {
+    // for each word look it up in invInd and return the list or Nil
+    // afterwards flatten all lists into a single list
+    words.flatMap(invInd.getOrElse(_, Nil).distinct)
+  }
 
-  def andConjunction(words: List[String], invInd: Map[String, List[Int]]): List[Int] = ???
+  def andConjunction(words: List[String], invInd: Map[String, List[Int]]): List[Int] = {
+    words.foldLeft(invInd.values.flatten.toSet)((conjunction, string) => {
+      conjunction.intersect(invInd.getOrElse(string, Nil).toSet)
+    }).toList
+  }
 }
 
 
