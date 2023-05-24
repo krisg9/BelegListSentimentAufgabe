@@ -14,9 +14,6 @@
     <orderEntry type="module-library" scope="PROVIDED">
       <library name="sbt: sbt-1.6.2">
         <CLASSES>
-          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.sbteclipse/sbteclipse-plugin/scala_2.12/sbt_1.0/5.2.2/jars/sbteclipse-plugin.jar!/" />
-          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.14/scalaz-core_2.12-7.2.14.jar!/" />
-          <root url="jar://$USER_HOME$/.cache/coursier/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.12/7.2.14/scalaz-effect_2.12-7.2.14.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/lib/scala-compiler.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/lib/scala-library.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/lib/scala-reflect.jar!/" />
@@ -106,6 +103,9 @@
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/org.scala-sbt/sbt/1.6.2/zinc-persist-core-assembly-1.6.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/org.scala-sbt/sbt/1.6.2/zinc-persist_2.12-1.6.0.jar!/" />
           <root url="jar://$USER_HOME$/.sbt/boot/scala-2.12.15/org.scala-sbt/sbt/1.6.2/zinc_2.12-1.6.0.jar!/" />
+          <root url="jar://$USER_HOME$/AppData/Local/Coursier/cache/v1/https/repo.scala-sbt.org/scalasbt/sbt-plugin-releases/com.typesafe.sbteclipse/sbteclipse-plugin/scala_2.12/sbt_1.0/5.2.2/jars/sbteclipse-plugin.jar!/" />
+          <root url="jar://$USER_HOME$/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-core_2.12/7.2.14/scalaz-core_2.12-7.2.14.jar!/" />
+          <root url="jar://$USER_HOME$/AppData/Local/Coursier/cache/v1/https/repo1.maven.org/maven2/org/scalaz/scalaz-effect_2.12/7.2.14/scalaz-effect_2.12-7.2.14.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
@@ -113,8 +113,8 @@
     </orderEntry>
   </component>
   <component name="SbtModule">
-    <option name="buildForURI" value="file:$MODULE_DIR$/../../" />
+    <option name="buildForURI" value="file:/$USER_HOME$/Uni%20S4/DataMining/Beleg1/BelegListSentimentAufgabe/" />
     <option name="imports" value="_root_.sbt.Keys._, _root_.sbt.ScriptedPlugin.autoImport._, _root_.sbt.plugins.JUnitXmlReportPlugin.autoImport._, _root_.sbt.plugins.MiniDependencyTreePlugin.autoImport._, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin.autoImport._, _root_.sbt._, _root_.sbt.nio.Keys._, _root_.sbt.plugins.IvyPlugin, _root_.sbt.plugins.JvmPlugin, _root_.sbt.plugins.CorePlugin, _root_.sbt.ScriptedPlugin, _root_.sbt.plugins.SbtPlugin, _root_.sbt.plugins.SemanticdbPlugin, _root_.sbt.plugins.JUnitXmlReportPlugin, _root_.sbt.plugins.Giter8TemplatePlugin, _root_.sbt.plugins.MiniDependencyTreePlugin, _root_.com.typesafe.sbteclipse.plugin.EclipsePlugin, _root_.scala.xml.{TopScope=&gt;SUB:DOLLARscope}" />
-    <option name="resolvers" value="https://repo1.maven.org/maven2/|maven|public, /home/kristiyan/.ivy2/cache|ivy|true|Local cache" />
+    <option name="resolvers" value="C:\Users\abedn\.ivy2\cache|ivy|true|Local cache, https://repo1.maven.org/maven2/|maven|public" />
   </component>
 </module>

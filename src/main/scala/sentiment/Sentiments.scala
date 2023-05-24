@@ -9,10 +9,13 @@ import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
 import org.jfree.ui.ApplicationFrame
 import org.jfree.util.ShapeUtilities
 
+import scala.annotation.tailrec
+import scala.io.Source
+
 /**
-  * @author hendrik
-  * modified by akarakochev
-  */
+ * @author hendrik
+ *         modified by akarakochev
+ */
 class Sentiments(sentiFile: String) {
 
   val sentiments: Map[String, Int] = getSentiments(sentiFile)
@@ -20,28 +23,85 @@ class Sentiments(sentiFile: String) {
   val proc = new Processing()
 
   /** ********************************************************************************************
-    *
-    * Aufgabe 5
-    *
-    * ********************************************************************************************
-    */
+   *
+   * Aufgabe 5
+   *
+   * ********************************************************************************************
+   */
 
-  def getDocumentGroupedByCounts(filename: String, wordCount: Int): List[(Int, List[String])] = ???
+  def getDocumentGroupedByCounts(filename: String, wordCount: Int): List[(Int, List[String])] = {
+    @tailrec
+    def helper(list: List[(Int, List[String])], woerter: List[String], int: Int): List[(Int, List[String])] = {
+      if (woerter.length < wordCount) list :+ (int, woerter.take(wordCount))
+      else helper(list :+ (int, woerter.take(wordCount)), woerter.slice(wordCount, woerter.length), int + 1)
+    }
 
-  def getDocumentSplitByPredicate(filename: String, predicate:String=>Boolean): List[(Int, List[String])] = ???
+    val source = Source.fromResource(filename)
+    val woerterA = source.getLines().mkString(" ").toLowerCase
+      .replace(".", "")
+      .replace("!", "")
+      .replace("?", "")
+      .replace(",", "")
+      .replace("'", " ")
+      .replace(";", "")
+      .replace("--", " ")
+      .split(" ")
+    source.close()
+
+    helper(List.empty[(Int, List[String])], woerterA.toList, 1)
+  }
+
+  def getDocumentSplitByPredicate(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
+    @tailrec
+    def helper(zeilen: List[String], erg: List[(Int, List[String])], int: Int): List[(Int, List[String])] = {
+      if (zeilen.isEmpty) erg.slice(1, erg.length)
+      else if (erg.isEmpty ||
+        predicate(zeilen.head)) {
+        helper(zeilen.slice(1, zeilen.length), erg :+ (int, List.empty), int + 1)
+      } else {
+        //val t = erg.last
+        //val i = t._1
+        //val l = t._2
+        //val ln = zeilen(0).split(" ").toList
+        //val le: List[String] = l ++ ln
+        //erg.updated(erg.length - 1, (i, le))
+        helper(zeilen.slice(1, zeilen.length)
+          , erg.updated(erg.length - 1, (erg.last._1, erg.last._2 ++
+            zeilen.head.split(" ").toList)), int)
+      }
+    }
+
+    def fixFormat(string: String): String = {
+      string.toLowerCase
+        .replace(".", "")
+        .replace("!", "")
+        .replace("?", "")
+        .replace(",", "")
+        .replace("'", " ")
+        .replace(";", "")
+        .replace("--", " ")
+    }
+
+    val source = Source.fromResource(filename)
+    val zeilenA = source.getLines().mkString("\n").linesIterator.toList
+
+    helper(zeilenA, List.empty[(Int, List[String])], 0).map {
+      case (num, strList) => (num, strList.map(fixFormat(_)))
+    }
+  }
 
   def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = ???
 
   /** ********************************************************************************************
-    *
-    * Helper Functions
-    *
-    * ********************************************************************************************
-    */
+   *
+   * Helper Functions
+   *
+   * ********************************************************************************************
+   */
 
   def getSentiments(filename: String): Map[String, Int] = {
     val url = getClass.getResource("/" + filename).getPath
-    val src = scala.io.Source.fromFile(url.replaceAll("%20"," "))
+    val src = scala.io.Source.fromFile(url.replaceAll("%20", " "))
     val iter = src.getLines()
     val result: Map[String, Int] = (for (row <- iter) yield {
       val seg = row.split("\t"); (seg(0) -> seg(1).toInt)
@@ -50,7 +110,7 @@ class Sentiments(sentiFile: String) {
     result
   }
 
-  def createGraph(data: List[(Int, Double, Double)], xlabel:String="Abschnitt", title:String="Sentiment-Analyse"): Unit = {
+  def createGraph(data: List[(Int, Double, Double)], xlabel: String = "Abschnitt", title: String = "Sentiment-Analyse"): Unit = {
 
     //create xy series
     val sentimentsSeries: XYSeries = new XYSeries("Sentiment-Werte")
@@ -87,7 +147,7 @@ class Sentiments(sentiFile: String) {
     val chart1: JFreeChart = new JFreeChart(plot1)
     val chart2: JFreeChart = new JFreeChart(plot2)
     val frame: ApplicationFrame = new ApplicationFrame(title)
-    frame.setLayout(new GridLayout(2,1))
+    frame.setLayout(new GridLayout(2, 1))
 
     val chartPanel1: ChartPanel = new ChartPanel(chart1)
     val chartPanel2: ChartPanel = new ChartPanel(chart2)
@@ -96,7 +156,7 @@ class Sentiments(sentiFile: String) {
     frame.add(chartPanel2)
     frame.pack()
     frame.setVisible(true)
-    
+
     println("Please press enter....")
     System.in.read()
     frame.setVisible(false)
