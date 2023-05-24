@@ -10,9 +10,9 @@ class Processing {
    * ********************************************************************************************
    */
   def getWords(line: String): List[String] = {
-    /*
+    /**
      * Extracts all words from a line
-     * 
+     *
      * 1. Removes all characters which are not letters (A-Z or a-z)
      * 2. Shifts all words to lower case
      * 3. Extracts all words and put them into a list of strings
@@ -26,18 +26,18 @@ class Processing {
   }
 
   def getAllWords(l: List[(Int, String)]): List[String] = {
-    /*
+    /**
      * Extracts all words from a List containing line number and line tuples
      * The words should be in the same order as they occur in the source document
-     * 
+     *
      * Hint: Use the flatMap function
      */
     l.flatMap(tuple => getWords(tuple._2))
   }
 
   def countWords(l: List[String]): List[(String, Int)] = {
-    /*
-     *  Gets a list of words and counts the occurrences of the individual words
+    /**
+     * Gets a list of words and counts the occurrences of the individual words
      */
     // group by word
     l.groupBy(identity)

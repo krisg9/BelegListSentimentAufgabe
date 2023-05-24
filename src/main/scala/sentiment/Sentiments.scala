@@ -30,25 +30,9 @@ class Sentiments(sentiFile: String) {
    */
 
   def getDocumentGroupedByCounts(filename: String, wordCount: Int): List[(Int, List[String])] = {
-    @tailrec
-    def helper(list: List[(Int, List[String])], woerter: List[String], int: Int): List[(Int, List[String])] = {
-      if (woerter.length < wordCount) list :+ (int, woerter.take(wordCount))
-      else helper(list :+ (int, woerter.take(wordCount)), woerter.slice(wordCount, woerter.length), int + 1)
-    }
-
-    val source = Source.fromResource(filename)
-    val woerterA = source.getLines().mkString(" ").toLowerCase
-      .replace(".", "")
-      .replace("!", "")
-      .replace("?", "")
-      .replace(",", "")
-      .replace("'", " ")
-      .replace(";", "")
-      .replace("--", " ")
-      .split(" ")
-    source.close()
-
-    helper(List.empty[(Int, List[String])], woerterA.toList, 1)
+    val source = Source.fromResource(filename).mkString
+    val words = proc.getWords(source)
+    (1 to words.length).toList.zip(words.grouped(wordCount))
   }
 
   def getDocumentSplitByPredicate(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
