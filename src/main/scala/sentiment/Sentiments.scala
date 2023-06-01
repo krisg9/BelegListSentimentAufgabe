@@ -90,7 +90,15 @@ class Sentiments(sentiFile: String) {
     }
   }
 
-  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = ???
+  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
+    def helper(l: List[(Int, List[String])], erg:List[(Int, Double, Double)]):{
+    //abbruch bedingung
+    //neues toupel
+    //toupel füllen
+    }
+
+    helper(l,List.empty[(Int, Double,Double)])
+  }
 
   /** ********************************************************************************************
    *
