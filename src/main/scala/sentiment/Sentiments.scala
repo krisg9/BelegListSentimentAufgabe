@@ -10,6 +10,7 @@ import org.jfree.ui.ApplicationFrame
 import org.jfree.util.ShapeUtilities
 
 import scala.annotation.tailrec
+import scala.collection.immutable.List
 import scala.io.Source
 
 /**
@@ -91,13 +92,45 @@ class Sentiments(sentiFile: String) {
   }
 
   def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
-    def helper(l: List[(Int, List[String])], erg:List[(Int, Double, Double)]):{
-    //abbruch bedingung
-    //neues toupel
-    //toupel füllen
+
+    val sentimentMap = getSentiments("AFINN-112.txt")
+
+    def getSentimentofAbsatz(absatz: List[String]): Double = {
+      absatz.foldLeft(0)((erg, wort) => erg + sentimentMap.getOrElse(wort, 0)).toDouble / getCountofAbsatzAbs(absatz)
+
+    }
+//todo fix this not finding every word for some reason?
+    def getCountofAbsatzAbs(absatz: List[String]): Double = {
+      val res1 = absatz.foldLeft(0)((erg, wort) => if (sentimentMap.contains(wort)) {
+       // print(wort+" ")
+        erg + 1
+      } else {
+        erg
+      }).toDouble
+
+      //println("\n"+"all word count:" + absatz.length)
+      //println("\n"+"ABS word count:" + res1)
+      res1
     }
 
-    helper(l,List.empty[(Int, Double,Double)])
+    def getCountofAbsatzRelativ(absatz: List[String]): Double = {
+      val res1 = getCountofAbsatzAbs(absatz) / absatz.length.toDouble
+      //println("Rel word count:" + res1)
+      res1
+    }
+
+    def helper(l: List[(Int, List[String])], erg: List[(Int, Double, Double)]): List[(Int, Double, Double)] = {
+      if (l.isEmpty) {
+        print(erg)
+        erg
+      }
+      else {
+        helper(l.slice(0, l.length - 1), (l.last._1 - 1, getSentimentofAbsatz(l.last._2), getCountofAbsatzRelativ(l.last._2)) +: erg
+        )
+      }
+    }
+
+    helper(l, List.empty[(Int, Double, Double)])
   }
 
   /** ********************************************************************************************
