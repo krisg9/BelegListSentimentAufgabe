@@ -9,7 +9,6 @@ import org.jfree.data.xy.{XYSeries, XYSeriesCollection}
 import org.jfree.ui.ApplicationFrame
 import org.jfree.util.ShapeUtilities
 
-import scala.annotation.tailrec
 import scala.io.Source
 
 /**
@@ -36,42 +35,25 @@ class Sentiments(sentiFile: String) {
   }
 
   def getDocumentSplitByPredicate(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
-    @tailrec
-    def helper(zeilen: List[String], erg: List[(Int, List[String])], int: Int): List[(Int, List[String])] = {
-      if (zeilen.isEmpty) erg.slice(1, erg.length)
-      else if (erg.isEmpty ||
-        predicate(zeilen.head)) {
-        helper(zeilen.slice(1, zeilen.length), erg :+ (int, List.empty), int + 1)
-      } else {
-        //val t = erg.last
-        //val i = t._1
-        //val l = t._2
-        //val ln = zeilen(0).split(" ").toList
-        //val le: List[String] = l ++ ln
-        //erg.updated(erg.length - 1, (i, le))
-        helper(zeilen.slice(1, zeilen.length)
-          , erg.updated(erg.length - 1, (erg.last._1, erg.last._2 ++
-            zeilen.head.split(" ").toList)), int)
-      }
-    }
-
-    def fixFormat(string: String): String = {
-      string.toLowerCase
-        .replace(".", "")
-        .replace("!", "")
-        .replace("?", "")
-        .replace(",", "")
-        .replace("'", " ")
-        .replace(";", "")
-        .replace("--", " ")
-    }
-
     val source = Source.fromResource(filename)
-    val zeilenA = source.getLines().mkString("\n").linesIterator.toList
-
-    helper(zeilenA, List.empty[(Int, List[String])], 0).map {
-      case (num, strList) => (num, strList.map(fixFormat(_)))
-    }
+      .getLines()
+      // cut all lines before the first predicate
+      .dropWhile(!predicate(_))
+      // combine paragraphs from left to right
+      .foldLeft(List.empty[String]) {
+        (acc, nextLine) => {
+          if (predicate(nextLine)) acc.appended("")
+          else {
+            acc match {
+              case Nil => List(nextLine)
+              // copy without last element and append the new line
+              case _ :: _ => acc.init :+ acc.last + nextLine
+            }
+          }
+        }
+      }
+      .map(paragraph => proc.getWords(paragraph))
+    (1 to 10000).toList.zip(source)
   }
 
   def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = ???
