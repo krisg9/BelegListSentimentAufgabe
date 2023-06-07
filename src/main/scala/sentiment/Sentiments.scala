@@ -31,6 +31,7 @@ class Sentiments(sentiFile: String) {
    */
 
   def getDocumentGroupedByCounts(filename: String, wordCount: Int): List[(Int, List[String])] = {
+    /*
     @tailrec
     def helper(list: List[(Int, List[String])], woerter: List[String], int: Int): List[(Int, List[String])] = {
       if (woerter.length < wordCount) list :+ (int, woerter.take(wordCount))
@@ -50,9 +51,13 @@ class Sentiments(sentiFile: String) {
     source.close()
 
     helper(List.empty[(Int, List[String])], woerterA.toList, 1)
+    */
+    val source = Source.fromResource(filename).mkString
+    val words = proc.getWords(source)
+    (1 to words.length).toList.zip(words.grouped(wordCount))
   }
 
-  def getDocumentSplitByPredicate(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
+  def getDocumentSplitByPredicateAlt(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
     @tailrec
     def helper(zeilen: List[String], erg: List[(Int, List[String])], int: Int): List[(Int, List[String])] = {
       if (zeilen.isEmpty) erg.slice(1, erg.length)
@@ -91,7 +96,35 @@ class Sentiments(sentiFile: String) {
     }
   }
 
-  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
+  def getDocumentSplitByPredicate(filename: String, predicate: String => Boolean): List[(Int, List[String])] = {
+    val source = Source.fromResource(filename)
+    val lines = source.getLines().dropWhile(!predicate(_))
+
+
+    (1 to 100).toList.zip(
+
+      lines.foldLeft(List.empty[String])((erg, line)
+      => {
+        if (predicate(line)) {
+          erg.appended("")
+        }
+        else {
+          erg match {
+            case Nil => List(line)
+            case _ => erg.init :+ erg.last + line
+            //case _ => erg.updated(erg.length - 1, erg.last + line)
+          }
+          // if (erg.isEmpty) erg.appended("")
+          // else erg.updated(erg.length - 1, erg.last + line)
+
+        }
+      }
+      ).map { case (str) => (proc.getWords(str)) }
+      //.foreach(st => proc.getWords(st))
+    )
+  }
+
+  def analyseSentiments2(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
 
     val sentimentMap = getSentiments("AFINN-112.txt")
 
@@ -99,10 +132,11 @@ class Sentiments(sentiFile: String) {
       absatz.foldLeft(0)((erg, wort) => erg + sentimentMap.getOrElse(wort, 0)).toDouble / getCountofAbsatzAbs(absatz)
 
     }
-//todo fix this not finding every word for some reason?
+
+    //todo fix this not finding every word for some reason?
     def getCountofAbsatzAbs(absatz: List[String]): Double = {
       val res1 = absatz.foldLeft(0)((erg, wort) => if (sentimentMap.contains(wort)) {
-       // print(wort+" ")
+        // print(wort+" ")
         erg + 1
       } else {
         erg
@@ -132,6 +166,45 @@ class Sentiments(sentiFile: String) {
 
     helper(l, List.empty[(Int, Double, Double)])
   }
+
+  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
+    //val sentimentMap = getSentiments("AFINN-112.txt")
+
+    val filteredList = l.map {
+      case (number, worte) => (number - 1,
+        worte.filter(sentiments.contains), //maybe optional
+        worte.count(sentiments.contains) / worte.length.toDouble)
+    }
+
+    val replacedList = filteredList.map {
+      case (number, worte, amount) => (number
+        , (worte.map(string => sentiments(string))).sum / worte.length.toDouble
+        , amount)
+    }
+
+    print(replacedList)
+    replacedList
+  }
+
+  def analyseSentiments3(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
+    l.map {
+      case (number: Int, list) => (
+        number - 1,
+        list.filter(sentiments.contains).map {
+          string: String => sentiments(string)
+        }.foldLeft(0.0)((erg, summand) => erg + summand) / list.count(sentiments.contains),
+        list.count(sentiments.contains).toDouble / list.length
+      )
+    }
+  }
+  /*
+  List(
+  (0,List(no, interest, growing, funeral, strong, prevent, cherish),0.035),
+  (1,List(noble, like, better),0.015),
+  (2,List(straight, strange, no, falling, attract, please, great),0.035),
+
+// 0. liste korrekt, 1. findet ein wort zu wenig, 2. ein wort zu viel
+   */
 
   /** ********************************************************************************************
    *

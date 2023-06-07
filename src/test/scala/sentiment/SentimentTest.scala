@@ -66,7 +66,7 @@ class SentimentTest extends AnyFunSuite {
         (11,2.5,0.043478260869565216))
 
     val epsilon= 0.01
-    val data= sentiAnalyse.analyseSentiments(sentiAnalyse.getDocumentGroupedByCounts("MobyDickC1.txt",200))
+    val data= sentiAnalyse.analyseSentiments3(sentiAnalyse.getDocumentGroupedByCounts("MobyDickC1.txt",200))
     val restest= data zip res map (X=> (Math.abs(X._1._2 - X._2._2), Math.abs(X._1._3 - X._2._3)))
     assert(restest.forall(X=>(X._1<epsilon) && (X._2 < epsilon)===true))
 
