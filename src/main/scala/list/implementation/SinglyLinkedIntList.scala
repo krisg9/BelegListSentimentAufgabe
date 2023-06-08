@@ -4,7 +4,7 @@ import list.traits.IntList
 
 /**
  * A companion object for the singly linked list.
- * This enables creating lists list this: val list = SinglyLinkedIntList(1,2,3)
+ * This enables creating lists like this: val list = SinglyLinkedIntList(1,2,3)
  * which results in Cons(1,Cons(2,Cons(3,Empty))))
  */
 object SinglyLinkedIntList {
@@ -66,8 +66,8 @@ abstract class SinglyLinkedIntList extends IntList {
   }
 
   override def reduceLeft(reduceFunc: (Int, Int) => Int): Int = this match {
-    // head as initial element
-    case Cons(_, _) => tail.foldLeft(head)(reduceFunc)
+    case Cons(_, Empty) => head
+    case Cons(head, tail) => Cons(reduceFunc(head, tail.head), tail.tail).reduceLeft(reduceFunc)
   }
 
   override def reduceRight(reduceFunc: (Int, Int) => Int): Int = this match {
@@ -80,7 +80,6 @@ abstract class SinglyLinkedIntList extends IntList {
   override def forAll(predicateFunc: Int => Boolean): Boolean = this match {
     case Cons(_, Empty) => predicateFunc(head)
     case Cons(_, _) =>
-      // when predicateFunc is called instead of current it increases c once more when returning false
       if (predicateFunc(head)) tail.forAll(predicateFunc) else false
   }
 

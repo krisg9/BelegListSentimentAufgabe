@@ -71,9 +71,6 @@ class ProcessingTest extends AnyFunSuite {
     new teststrings {
 
       val result = proc.countWords(proc.getAllWords(test_list))
-      println(test_list)
-      println(result)
-      println(wordOccurences)
       assert(result.length === 19)
       assert(result.sorted === wordOccurences)
     }

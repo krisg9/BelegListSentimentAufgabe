@@ -56,7 +56,22 @@ class Sentiments(sentiFile: String) {
     (1 to 10000).toList.zip(source)
   }
 
-  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = ???
+  def analyseSentiments(l: List[(Int, List[String])]): List[(Int, Double, Double)] = {
+    l.map {
+      case (index: Int, words: List[String]) =>
+        // create the 3-tuple which is returned
+        (index,
+          // convert words to sentiment scores
+          words
+            .filter(sentiments.contains)
+            .map(word => sentiments(word))
+            .foldLeft(0.0)((acc, sentimentVal) => acc + sentimentVal) / words.count(sentiments.contains),
+          // calculate used words
+          words
+            .count(sentiments.contains).toDouble / words.length.toDouble
+        )
+    }
+  }
 
   /** ********************************************************************************************
    *
